@@ -1,3 +1,4 @@
+import argparse
 import torch
 import torchvision
 from torchvision.transforms import transforms
@@ -13,6 +14,15 @@ def imshow(img):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--train', action='store_true', help='train the network')
+    parser.add_argument('--test', action='store_true', help='test the network')
+    parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
+    parser.add_argument('-b', '--batch_size', type=int, default=4, help='input batch size for training (default: 4)')
+    parser.add_argument('-o', '--outfile', default='net.pth', help='output file for the trained network (default: net.pth)')
+
+    args = parser.parse_args()
+
     transform = transforms.Compose(
         [transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
@@ -33,10 +43,13 @@ if __name__ == '__main__':
 
     dataiter = iter(trainloader)
     images, labels = next(dataiter)
-
     net = CNN.Net()
-    # net.train(2, trainloader) # train the network
-    # net.save()
-    net.load_state_dict(torch.load('cifar_net.pth'))
-    net.test(testloader) # test the network)
 
+    if (args.train):
+        net.train(args.epochs, trainloader) # train the network
+        net.save()
+    else:
+        net.load_state_dict(torch.load('cifar_net.pth'))
+
+    if (args.test):
+        net.test(testloader) # test the network
