@@ -16,6 +16,7 @@ def imshow(img):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--train', action='store_true', help='train the network')
+    parser.add_argument('-c', '--cuda', action='store_true', default=False, help='enable cuda')
     parser.add_argument('--test', action='store_true', help='test the network')
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
     parser.add_argument('-b', '--batch_size', type=int, default=4, help='input batch size for training (default: 4)')
@@ -40,20 +41,26 @@ if __name__ == '__main__':
                                            transform=transform)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=2)
 
-    print(type(testset), testset)
-    print(type(testloader), testloader)
-
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     dataiter = iter(trainloader)
     images, labels = next(dataiter)
+
+    # Enable CUDA if available
+    if args.cuda:
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = torch.device('cpu')
+
+    # Instantiate the network
     net = CNN.Net()
+    net.to(device)
 
     if (args.train):
-        net.train(args.epochs, trainloader) # train the network
+        net.train(args.epochs, trainloader)
         net.save(args.outfile)
     else:
         net.load_state_dict(torch.load(args.infile))
 
     if (args.test):
-        net.test(testloader) # test the network
+        net.test(testloader)
