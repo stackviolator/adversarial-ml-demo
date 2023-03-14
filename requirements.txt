@@ -1,2 +1,5 @@
+argparse
+matplotlib
+numpy
 torch
 torchvision

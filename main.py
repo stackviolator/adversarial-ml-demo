@@ -40,6 +40,9 @@ if __name__ == '__main__':
                                            transform=transform)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=2)
 
+    print(type(testset), testset)
+    print(type(testloader), testloader)
+
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     dataiter = iter(trainloader)
@@ -50,7 +53,7 @@ if __name__ == '__main__':
         net.train(args.epochs, trainloader) # train the network
         net.save(args.outfile)
     else:
-        net.load_state_dict(torch.load('cifar_net.pth'))
+        net.load_state_dict(torch.load(args.infile))
 
     if (args.test):
         net.test(testloader) # test the network
