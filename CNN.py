@@ -28,6 +28,7 @@ class Net(nn.Module):
         optimizer = optim.SGD(self.parameters(), lr=0.001, momentum=0.9)
 
         for epoch in range(epochs):
+            print("Epoch: ", epoch + 1, "/", epochs)
             running_loss = 0.001
             for i, data in enumerate(trainloader, 0):
                 inputs, labels = data
@@ -46,7 +47,7 @@ class Net(nn.Module):
 
         print("Finished Training")
 
-    def save(self, PATH="./cifar_net.pth"):
+    def save(self, PATH):
         torch.save(self.state_dict(), PATH)
 
     def test(self, testloader):

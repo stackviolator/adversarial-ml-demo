@@ -19,7 +19,8 @@ if __name__ == '__main__':
     parser.add_argument('--test', action='store_true', help='test the network')
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
     parser.add_argument('-b', '--batch_size', type=int, default=4, help='input batch size for training (default: 4)')
-    parser.add_argument('-o', '--outfile', default='net.pth', help='output file for the trained network (default: net.pth)')
+    parser.add_argument('-o', '--outfile', default='nets/net.pth', help='output file for the trained network (default: nets/net.pth)')
+    parser.add_argument('-i', '--infile', default='nets/net.pth', help='input file for the trained network (default: nets/net.pth)')
 
     args = parser.parse_args()
 
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
     if (args.train):
         net.train(args.epochs, trainloader) # train the network
-        net.save()
+        net.save(args.outfile)
     else:
         net.load_state_dict(torch.load('cifar_net.pth'))
 
