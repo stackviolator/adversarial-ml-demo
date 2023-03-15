@@ -14,6 +14,11 @@ def imshow(img):
 
 
 if __name__ == '__main__':
+    epsilons = [0, .05, .1, .15, .2, .25, .3]
+    epsilons = [0, .05, .1, .15]
+    accuracies = []
+    examples = []
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--train', action='store_true', help='train the network')
     parser.add_argument('-c', '--cuda', action='store_true', default=False, help='enable cuda')
@@ -33,17 +38,34 @@ if __name__ == '__main__':
     batch_size = args.batch_size
 
     # Define datasets
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+    trainset = torchvision.datasets.CIFAR10(
+        root='./data',
+        train=True,
+        download=True,
+        transform=transform
+    )
+    testset = torchvision.datasets.CIFAR10(
+        root='./data',
+        train=False,
+        download=True,
+        transform=transform
+    )
 
     # Define dataloaders
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
-    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(
+        trainset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=2
+    )
+    testloader = torch.utils.data.DataLoader(
+        testset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=2
+    )
 
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-
-    dataiter = iter(trainloader)
-    images, labels = next(dataiter)
 
     # Enable CUDA if available
     if args.cuda:
@@ -65,3 +87,26 @@ if __name__ == '__main__':
 
     if (args.test):
         net.test(testloader)
+
+    for eps in epsilons:
+        acc, ex = net.test_perturbed(testloader, eps)
+        accuracies.append(acc)
+        examples.append(ex)
+
+    # Shit dont quite work yet but its in progress
+    cnt = 0
+    plt.figure(figsize=(8,10))
+    for i in range(len(epsilons)):
+        for j in range(len(examples[i])):
+            cnt += 1
+            plt.subplot(len(epsilons),len(examples[0]),cnt)
+            plt.xticks([], [])
+            plt.yticks([], [])
+            if j == 0:
+                plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
+            orig,adv,ex = examples[i][j]
+            for img in ex:
+                plt.imshow(img.T)
+            plt.title("{} -> {}".format(orig, adv))
+    plt.tight_layout()
+    plt.show()

@@ -23,21 +23,20 @@ class Net(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        return x
+        return F.log_softmax(x, dim=1)
 
     def train(self, epochs, trainloader):
         torch.backends.cudnn.benchmark = True
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(self.parameters(), lr=0.001)
+        optimizer = optim.Adam(self.parameters(), lr=1e-2)
 
         for epoch in range(epochs):
             print("Epoch: ", epoch + 1, "/", epochs)
             running_loss = 0.001
             for i, data in enumerate(trainloader, 0):
+                inputs, labels = data
                 if self.cuda:
-                    inputs, labels = data[0].to(self.device), data[1].to(self.device)
-                else:
-                    inputs, labels = data
+                    inputs, labels = inputs.to(self.device), labels.to(self.device)
 
                 optimizer.zero_grad()
 
@@ -50,7 +49,6 @@ class Net(nn.Module):
                 if i % 2000 == 1999 :
                     print(f"[{epoch + i}, {i + 1:5d} loss: {running_loss / 2000:.3f}]")
                     running_loss = 0.0
-
         print("Finished Training")
 
     def save(self, PATH):
@@ -68,7 +66,71 @@ class Net(nn.Module):
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
+
+                """
+                Predicted is a tensor of guesses, labels is a tensor is ground truths
+                Compare the tensors, result of (predicted == labels) is a tensor of bools,
+                reflecting which of the predicted values were correct (represented as True)
+                True = 1, False = -1, therefore a sum of the tensor is the amount of correct guesses
+                """
                 correct += (predicted == labels).sum().item()
 
         print(f"Accuracy of the network on the 10k test images: {100 * correct // total}%")
 
+    def fgsm_attack(self, images, epsilon, data_grad):
+        sign_data_grad = data_grad.sign()
+        # Here the attack
+        p_images = images + (epsilon * sign_data_grad)
+        # Clamp tensors to -1,1 range
+        p_images = torch.clamp(p_images, -1, 1)
+        return p_images
+
+    def test_perturbed(self, testloader, epsilon):
+        correct = 0
+        total = 0
+        adv_examples = []
+
+        # Init the data
+        for i, data in enumerate(testloader, 0):
+            inputs, labels = data
+            inputs, labels = inputs.to(self.device), labels.to(self.device)
+
+            inputs.requires_grad = True
+
+            # Get the outputs and the prediction
+            outputs = self(inputs)
+            _, init_pred = torch.max(outputs.data, 1)
+
+            total += labels.size(0)
+
+            # Define the loss function and get the gradient for FGSM
+            loss = F.nll_loss(outputs, labels)
+            self.zero_grad()
+            loss.backward()
+            data_grad = inputs.grad
+
+            # Define the perturbed data
+            perturbed_inputs = self.fgsm_attack(inputs, epsilon, data_grad)
+
+            # Get the new outputs and predictions
+            outputs = self(perturbed_inputs)
+            _, final_pred = torch.max(outputs.data, 1)
+
+            # Keep stats on how many correct samples
+            correct += (final_pred == labels).sum().item()
+
+            # Check if the induvidual samples are ==, for later data visualization
+            for i in range(len(labels)):
+                if final_pred[i] == labels[i]:
+                    if (epsilon == 0) and (len(adv_examples) < 5):
+                        adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
+                        adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
+                else:
+                    if len(adv_examples) < 5:
+                        adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
+                        adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
+
+        final_acc = 100 * correct // total
+        print(f"Accuracy of the network with Epsilon {epsilon} on the perturbed images: {100 * correct // total}%")
+
+        return final_acc, adv_examples
