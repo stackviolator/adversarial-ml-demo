@@ -4,7 +4,7 @@ import torchvision
 from torchvision.transforms import transforms
 import matplotlib.pyplot as plt
 import numpy as np
-import CNN
+import Net
 
 def imshow(img):
     img = img / 2 + 0.5
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     # Instantiate the network
-    net = CNN.Net(args.cuda, device)
+    net = Net.Net(args.cuda, device)
     net.to(device)
 
     if args.train:
@@ -94,6 +94,15 @@ if __name__ == '__main__':
             acc, ex = net.test_perturbed(testloader, eps)
             accuracies.append(acc)
             examples.append(ex)
+
+        plt.figure(figsize=(5,5))
+        plt.plot(epsilons, accuracies, "*-")
+        plt.yticks(np.arange(0, 1.1, step=0.1))
+        plt.xticks(np.arange(0, .35, step=0.05))
+        plt.title("Accuracy vs Epsilon")
+        plt.xlabel("Epsilon")
+        plt.ylabel("Accuracy")
+        plt.show()
 
         # Shit dont quite work yet but its in progress
         cnt = 0
