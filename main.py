@@ -84,7 +84,7 @@ if __name__ == '__main__':
         net.train(args.epochs, trainloader)
         net.save(args.outfile)
     else:
-        net.load_state_dict(torch.load(args.infile))
+        net.load_state_dict(torch.load(args.infile, map_location=device))
 
     if args.test:
         net.test(testloader)
