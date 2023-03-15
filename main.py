@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--cuda', action='store_true', default=False, help='enable cuda')
     parser.add_argument('--test', action='store_true', help='test the network')
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
-    parser.add_argument('-b', '--batch_size', type=int, default=4, help='input batch size for training (default: 4)')
+    parser.add_argument('-b', '--batch-size', type=int, default=4, help='input batch size for training (default: 4)')
     parser.add_argument('-o', '--outfile', default='nets/net.pth', help='output file for the trained network (default: nets/net.pth)')
     parser.add_argument('-i', '--infile', default='nets/net.pth', help='input file for the trained network (default: nets/net.pth)')
 
@@ -30,15 +30,14 @@ if __name__ == '__main__':
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
     )
 
-    batch_size = 4
+    batch_size = args.batch_size
 
-    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True,
-                                            transform=transform)
-    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                              shuffle=True, num_workers=2)
+    # Define datasets
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+    testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 
-    testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True,
-                                           transform=transform)
+    # Define dataloaders
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=2)
 
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -49,11 +48,13 @@ if __name__ == '__main__':
     # Enable CUDA if available
     if args.cuda:
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        if device != "cpu":
+            print(f"Using CUDA device {device}")
     else:
         device = torch.device('cpu')
 
     # Instantiate the network
-    net = CNN.Net()
+    net = CNN.Net(args.cuda, device)
     net.to(device)
 
     if (args.train):
