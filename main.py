@@ -22,6 +22,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--train', action='store_true', help='train the network')
     parser.add_argument('-c', '--cuda', action='store_true', default=False, help='enable cuda')
+    parser.add_argument('-p', '--perturb', action='store_true', default=False, help='test adversarial perturbation')
     parser.add_argument('--test', action='store_true', help='test the network')
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
     parser.add_argument('-b', '--batch-size', type=int, default=4, help='input batch size for training (default: 4)')
@@ -79,34 +80,35 @@ if __name__ == '__main__':
     net = CNN.Net(args.cuda, device)
     net.to(device)
 
-    if (args.train):
+    if args.train:
         net.train(args.epochs, trainloader)
         net.save(args.outfile)
     else:
         net.load_state_dict(torch.load(args.infile))
 
-    if (args.test):
+    if args.test:
         net.test(testloader)
 
-    for eps in epsilons:
-        acc, ex = net.test_perturbed(testloader, eps)
-        accuracies.append(acc)
-        examples.append(ex)
+    if args.perturb:
+        for eps in epsilons:
+            acc, ex = net.test_perturbed(testloader, eps)
+            accuracies.append(acc)
+            examples.append(ex)
 
-    # Shit dont quite work yet but its in progress
-    cnt = 0
-    plt.figure(figsize=(8,10))
-    for i in range(len(epsilons)):
-        for j in range(len(examples[i])):
-            cnt += 1
-            plt.subplot(len(epsilons),len(examples[0]),cnt)
-            plt.xticks([], [])
-            plt.yticks([], [])
-            if j == 0:
-                plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
-            orig,adv,ex = examples[i][j]
-            for img in ex:
-                plt.imshow(img.T)
-            plt.title("{} -> {}".format(orig, adv))
-    plt.tight_layout()
-    plt.show()
+        # Shit dont quite work yet but its in progress
+        cnt = 0
+        plt.figure(figsize=(8,10))
+        for i in range(len(epsilons)):
+            for j in range(len(examples[i])):
+                cnt += 1
+                plt.subplot(len(epsilons),len(examples[0]),cnt)
+                plt.xticks([], [])
+                plt.yticks([], [])
+                if j == 0:
+                    plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
+                orig,adv,ex = examples[i][j]
+                for img in ex:
+                    plt.imshow(img.T)
+                plt.title("{} -> {}".format(orig, adv))
+        plt.tight_layout()
+        plt.show()
