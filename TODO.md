@@ -4,4 +4,5 @@
 4. Add option to generate an store the adversarial noise
 	a. Set epsilon to 1 or 100%, store first example from a Tensor
 5. Make the matplotting gootd
-6. W
+6. Convert py script to notebook
+7. W

@@ -34,8 +34,8 @@ class Net(nn.Module):
             running_loss = 0.001
             for i, data in enumerate(trainloader, 0):
                 inputs, labels = data
-                if self.cuda:
-                    inputs, labels = inputs.to(self.device), labels.to(self.device)
+                inputs, labels = inputs.to(self.device), labels.to(self.device)
+                inputs.requires_grad = True
 
                 optimizer.zero_grad()
 
@@ -108,7 +108,6 @@ class Net(nn.Module):
         for i, data in enumerate(testloader, 0):
             inputs, labels = data
             inputs, labels = inputs.to(self.device), labels.to(self.device)
-
             inputs.requires_grad = True
 
             # Get the outputs and the prediction
