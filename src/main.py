@@ -37,7 +37,10 @@ if __name__ == '__main__':
     # Add custom epsilon values
     with open(args.epsilon, 'r') as f:
         for line in f:
-            epsilons.append(float(line))
+            # "#" is used as a comment
+            if "#" not in line:
+                epsilons.append(float(line))
+    epsilons.append(float(1))
 
     transform = transforms.Compose(
         [transforms.ToTensor(),
@@ -135,17 +138,18 @@ if __name__ == '__main__':
             # Each index in examples is a tuple of (initial_prediction, final_prediction, image)
             examples.append(ex)
 
-        '''
         # Show the epilson vs accuracy graph
         plt.figure(figsize=(5,5))
-        plt.plot(epsilons, accuracies, "*-")
-        plt.yticks(np.arange(0, 1.1, step=0.1))
-        plt.xticks(np.arange(0, .35, step=0.05))
+        # Last epsilon is 1, we don't want to plot it
+        plt.plot(epsilons[:-1], accuracies[:-1], "*-")
+        plt.yticks(np.arange(1.1, step=0.1))
+        # Last epsilon is 1, we don't want to plot it, so we use epsilons[-2]
+        # Step by the second epsilon value
+        plt.xticks(np.arange(epsilons[0], epsilons[-2], step=float(epsilons[1])))
         plt.title("Accuracy vs Epsilon")
         plt.xlabel("Epsilon")
         plt.ylabel("Accuracy")
         plt.show()
-        '''
 
         # Need to unnormalize the images (normalized images = bad for displaying w matplot)
         un = Unnormalize.Unnormalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
