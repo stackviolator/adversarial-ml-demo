@@ -34,10 +34,8 @@ To use the script, you can run the following command:
 To train the network with the default settings, run:
 `python main.py --train`
 
-
 To test the trained network, run:
 `python main.py --test`
-
 
 To test adversarial perturbation, run:
 `To test adversarial perturbation, run:`
@@ -45,7 +43,8 @@ To test adversarial perturbation, run:
 To test the network with a specific image, run:
 `python main.py --image path/to/image.jpg`
 
-
-
 ## Output
 The script displays the classification results and, if the `--perturb` option is used, shows a plot of the accuracy vs. epsilon values for adversarial perturbation. It also saves the trained network weights in the specified output file.
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
