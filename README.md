@@ -24,10 +24,11 @@ To use the script, you can run the following command:
 - `-p`, `--perturb`: Test adversarial perturbation.
 - `--test`: Test the network.
 - `-e`, `--epochs`: Number of epochs to train (default: 2).
+- `-ep`, `--epilson`: Input path to specify custom epsilon values (default: ../data/epsilons).
 - `-b`, `--batch-size`: Input batch size for training (default: 4).
 - `-i`, `--image`: Load an image.
-- `-o`, `--outfile`: Output file for the trained network (default: nets/net.pth).
-- `--infile`: Input file for the trained network (default: nets/net.pth).
+- `-o`, `--outfile`: Output file for the trained network (default: ../nets/net.pth).
+- `--infile`: Input file for the trained network (default: ../nets/net.pth).
 
 ## Example
 
