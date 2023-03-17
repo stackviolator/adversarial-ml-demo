@@ -44,34 +44,36 @@ if __name__ == '__main__':
 
     batch_size = args.batch_size
 
-    # Define datasets
-    trainset = torchvision.datasets.CIFAR10(
-        root='./data',
-        train=True,
-        download=True,
-        transform=transform
-    )
-    testset = torchvision.datasets.CIFAR10(
-        root='./data',
-        train=False,
-        download=True,
-        transform=transform
-    )
+    # Define training set and loader
+    if args.train:
+        trainset = torchvision.datasets.CIFAR10(
+            root='./data',
+            train=True,
+            download=True,
+            transform=transform
+        )
+        trainloader = torch.utils.data.DataLoader(
+            trainset,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=2
+        )
 
-    # Define dataloaders
-    trainloader = torch.utils.data.DataLoader(
-        trainset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=2
-    )
+    # Define test set and loader
+    if args.test or args.perturb:
+        testset = torchvision.datasets.CIFAR10(
+            root='./data',
+            train=False,
+            download=True,
+            transform=transform
+        )
 
-    testloader = torch.utils.data.DataLoader(
-        testset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=2
-    )
+        testloader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=2
+        )
 
     classes = {
         0 : 'plane',
