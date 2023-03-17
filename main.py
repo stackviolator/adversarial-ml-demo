@@ -5,6 +5,8 @@ from torchvision.transforms import transforms
 import matplotlib.pyplot as plt
 import numpy as np
 import Net
+import Unnormalize
+from PIL import Image
 
 def imshow(img):
     img = img / 2 + 0.5
@@ -14,8 +16,10 @@ def imshow(img):
 
 
 if __name__ == '__main__':
-    epsilons = [0, .05, .1, .15, .2, .25, .3]
     epsilons = [0, .05, .1, .15]
+    # epsilons = [0, .05, .1, .15, .2, .25, .3]
+    # epsilons = [0, .005, .01, .015, .02, .025, .03]
+    # epsilons = [0, .005, .01, .015]
     accuracies = []
     examples = []
 
@@ -26,14 +30,16 @@ if __name__ == '__main__':
     parser.add_argument('--test', action='store_true', help='test the network')
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
     parser.add_argument('-b', '--batch-size', type=int, default=4, help='input batch size for training (default: 4)')
+    parser.add_argument('-i', '--image', type=str, help='load an image')
     parser.add_argument('-o', '--outfile', default='nets/net.pth', help='output file for the trained network (default: nets/net.pth)')
-    parser.add_argument('-i', '--infile', default='nets/net.pth', help='input file for the trained network (default: nets/net.pth)')
+    parser.add_argument('--infile', default='nets/net.pth', help='input file for the trained network (default: nets/net.pth)')
 
     args = parser.parse_args()
 
     transform = transforms.Compose(
         [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) # normalize the pics (bad for displaying w matplot)
+         ]
     )
 
     batch_size = args.batch_size
@@ -89,12 +95,30 @@ if __name__ == '__main__':
     if args.test:
         net.test(testloader)
 
+    if args.image:
+        # Load image from path and resize to 32x32
+        img = Image.open(args.image)
+        img = img.resize((32, 32))
+
+        # Define transform to tensor and noramlize
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ])
+
+        # Convert image to tensor
+        img = transform(img)
+        net.test_image(img)
+
     if args.perturb:
         for eps in epsilons:
             acc, ex = net.test_perturbed(testloader, eps)
             accuracies.append(acc)
+            # Each index in examples is a tuple of (initial_prediction, final_prediction, image)
             examples.append(ex)
 
+        '''
+        # Show the epilson vs accuracy graph
         plt.figure(figsize=(5,5))
         plt.plot(epsilons, accuracies, "*-")
         plt.yticks(np.arange(0, 1.1, step=0.1))
@@ -103,21 +127,22 @@ if __name__ == '__main__':
         plt.xlabel("Epsilon")
         plt.ylabel("Accuracy")
         plt.show()
+        '''
 
-        # Shit dont quite work yet but its in progress
-        cnt = 0
+        # Need to unnormalize the images (normalized images = bad for displaying w matplot)
+        un = Unnormalize.Unnormalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        # Plot all images in examples
+        x = 0
         plt.figure(figsize=(8,10))
-        for i in range(len(epsilons)):
+        for i in range(len(examples)):
             for j in range(len(examples[i])):
-                cnt += 1
-                plt.subplot(len(epsilons),len(examples[0]),cnt)
-                plt.xticks([], [])
-                plt.yticks([], [])
-                if j == 0:
-                    plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
-                orig,adv,ex = examples[i][j]
-                for img in ex:
-                    plt.imshow(img.T)
-                plt.title("{} -> {}".format(orig, adv))
+                x += 1
+                plt.subplot(len(epsilons),len(examples[0]), x)
+                init_pred, final_pred, img_list = examples[i][j]
+                for img in img_list:
+                    img = un(torch.from_numpy(img))
+                    img = img.T
+                    plt.imshow(img)
+                    plt.title(f"Image with epsilon {epsilons[i]}")
         plt.tight_layout()
         plt.show()

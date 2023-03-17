@@ -15,15 +15,14 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
-
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = torch.flatten(x, 1) # flatten all dimensions except batch
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return F.log_softmax(x, dim=1)
+        x = F.log_softmax(self.fc3(x), dim=1)
+        return x
 
     def train(self, epochs, trainloader):
         torch.backends.cudnn.benchmark = True
@@ -54,14 +53,30 @@ class Net(nn.Module):
     def save(self, PATH):
         torch.save(self.state_dict(), PATH)
 
+    def test_image(self, image):
+        with torch.no_grad():
+            image = image.to(self.device)
+            '''
+            ** BAD CODE **
+            Conv2d expected a tensor of 4 bundled images, but we only have 1
+            So we create a tensor of 4 images, all the same as the original
+            '''
+            img_list = image.tolist()
+            image = torch.Tensor([img_list, img_list, img_list, img_list])
+            output = self(image)
+            print(output)
+            _, predicted = torch.max(output.data, 1)
+            # All the predictions are the same, so we only need the first one
+            predicted = predicted.tolist()[0]
+            print(predicted)
+
     def test(self, testloader):
         correct = 0
         total = 0
         with torch.no_grad():
             for data in testloader:
                 images, labels = data
-                if self.cuda:
-                    images, labels = images.to(self.device), labels.to(self.device)
+                images, labels = images.to(self.device), labels.to(self.device)
                 outputs = self(images)
 
                 _, predicted = torch.max(outputs.data, 1)
@@ -122,11 +137,11 @@ class Net(nn.Module):
             # Check if the induvidual samples are ==, for later data visualization
             for i in range(len(labels)):
                 if final_pred[i] == labels[i]:
-                    if (epsilon == 0) and (len(adv_examples) < 5):
+                    if (epsilon == 0) and (len(adv_examples) < 1):
                         adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
                         adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
                 else:
-                    if len(adv_examples) < 5:
+                    if len(adv_examples) < 1:
                         adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
                         adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
 
