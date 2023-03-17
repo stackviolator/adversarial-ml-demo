@@ -64,11 +64,10 @@ class Net(nn.Module):
             img_list = image.tolist()
             image = torch.Tensor([img_list, img_list, img_list, img_list])
             output = self(image)
-            print(output)
             _, predicted = torch.max(output.data, 1)
             # All the predictions are the same, so we only need the first one
             predicted = predicted.tolist()[0]
-            print(predicted)
+            return predicted
 
     def test(self, testloader):
         correct = 0

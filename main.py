@@ -65,6 +65,7 @@ if __name__ == '__main__':
         shuffle=True,
         num_workers=2
     )
+
     testloader = torch.utils.data.DataLoader(
         testset,
         batch_size=batch_size,
@@ -72,7 +73,18 @@ if __name__ == '__main__':
         num_workers=2
     )
 
-    classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    classes = {
+        0 : 'plane',
+        1 : 'car',
+        2 :'bird',
+        3 : 'cat',
+        4 : 'deer',
+        5 : 'dog',
+        6 : 'frog',
+        7 : 'horse',
+        8 : 'ship',
+        9 : 'truck'
+    }
 
     # Enable CUDA if available
     if args.cuda:
@@ -97,7 +109,7 @@ if __name__ == '__main__':
 
     if args.image:
         # Load image from path and resize to 32x32
-        img = Image.open(args.image)
+        img = Image.open(args.image).convert('RGB')
         img = img.resize((32, 32))
 
         # Define transform to tensor and noramlize
@@ -108,7 +120,8 @@ if __name__ == '__main__':
 
         # Convert image to tensor
         img = transform(img)
-        net.test_image(img)
+        prediction = net.test_image(img)
+        print( f"Prediction: {classes[prediction]}" )
 
     if args.perturb:
         for eps in epsilons:
