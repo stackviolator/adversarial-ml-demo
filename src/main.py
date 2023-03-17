@@ -16,12 +16,9 @@ def imshow(img):
 
 
 if __name__ == '__main__':
-    epsilons = [0, .05, .1, .15]
-    # epsilons = [0, .05, .1, .15, .2, .25, .3]
-    # epsilons = [0, .005, .01, .015, .02, .025, .03]
-    # epsilons = [0, .005, .01, .015]
     accuracies = []
     examples = []
+    epsilons = []
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--train', action='store_true', help='train the network')
@@ -31,10 +28,16 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--epochs', type=int, default=2, help='number of epochs to train (default: 2)')
     parser.add_argument('-b', '--batch-size', type=int, default=4, help='input batch size for training (default: 4)')
     parser.add_argument('-i', '--image', type=str, help='load an image')
-    parser.add_argument('-o', '--outfile', default='nets/net.pth', help='output file for the trained network (default: nets/net.pth)')
-    parser.add_argument('--infile', default='nets/net.pth', help='input file for the trained network (default: nets/net.pth)')
+    parser.add_argument('-ep', '--epsilon', type=str, default="../data/epsilons", help='load custom epsilon values from a file')
+    parser.add_argument('-o', '--outfile', default='../nets/net.pth', help='output file for the trained network (default: ../nets/net.pth)')
+    parser.add_argument('--infile', default='../nets/net.pth', help='input file for the trained network (default: ../nets/net.pth)')
 
     args = parser.parse_args()
+
+    # Add custom epsilon values
+    with open(args.epsilon, 'r') as f:
+        for line in f:
+            epsilons.append(float(line))
 
     transform = transforms.Compose(
         [transforms.ToTensor(),
@@ -47,7 +50,7 @@ if __name__ == '__main__':
     # Define training set and loader
     if args.train:
         trainset = torchvision.datasets.CIFAR10(
-            root='./data',
+            root='../data',
             train=True,
             download=True,
             transform=transform
@@ -62,7 +65,7 @@ if __name__ == '__main__':
     # Define test set and loader
     if args.test or args.perturb:
         testset = torchvision.datasets.CIFAR10(
-            root='./data',
+            root='../data',
             train=False,
             download=True,
             transform=transform
