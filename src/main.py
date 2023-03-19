@@ -138,11 +138,13 @@ if __name__ == '__main__':
             # Each index in examples is a tuple of (initial_prediction, final_prediction, image)
             examples.append(ex)
 
+        # TODO : fix axis labels
         # Show the epilson vs accuracy graph
         plt.figure(figsize=(5,5))
         # Last epsilon is 1, we don't want to plot it
         plt.plot(epsilons[:-1], accuracies[:-1], "*-")
-        plt.yticks(np.arange(1.1))
+        plt.yticks(np.arange(0, 1.1, step=0.1))
+        plt.ylim((0, 1.1))
         # Last epsilon is 1, we don't want to plot it, so we use epsilons[-2]
         # Step by the second epsilon value
         plt.xticks(np.arange(epsilons[0], epsilons[-2], step=float(epsilons[1])))
@@ -155,6 +157,7 @@ if __name__ == '__main__':
         un = Unnormalize.Unnormalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 
         # Plot all images in examples
+        # TODO : plot 4 examples per epsilon
         x = 0
         plt.figure(figsize=(8,10))
         for i in range(len(examples)):
