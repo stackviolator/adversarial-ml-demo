@@ -1,0 +1,9 @@
+# epsilons should be evenly incremented or else plotting epsilon vs accuracy wont work right
+0
+.05
+.1
+.15
+.2
+.25
+.3
+1
