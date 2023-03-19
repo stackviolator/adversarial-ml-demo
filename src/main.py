@@ -163,7 +163,8 @@ if __name__ == '__main__':
                 init_pred, final_pred, img_list = examples[i][j]
                 for img in img_list:
                     img = un(torch.from_numpy(img))
-                    img = img.T
+                    # Convert to numpy and transpose to (32, 32, 3)
+                    img = img.permute(*torch.arange(img.dim() - 1, -1, -1))
                     plt.imshow(img)
                     plt.title(f"Image with epsilon {epsilons[i]}")
         plt.tight_layout()
