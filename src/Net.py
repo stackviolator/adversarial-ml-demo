@@ -132,14 +132,15 @@ class Net(nn.Module):
             # Keep stats on how many correct samples
             correct += (final_pred == labels).sum().item()
 
-            # Check if the induvidual samples are ==, for later data visualization
             for i in range(len(labels)):
+                # Store images that are correctly classified with Epsilon 0
                 if final_pred[i] == labels[i]:
                     if (epsilon == 0) and (len(adv_examples) < 1):
                         adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
                         adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
+                # Store images that are misclassified where Epsilon is not 0
                 else:
-                    if len(adv_examples) < 1:
+                    if len(adv_examples) < 5:
                         adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
                         adv_examples.append( (init_pred[i], final_pred[i], adv_ex) )
 
