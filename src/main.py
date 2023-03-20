@@ -134,7 +134,7 @@ if __name__ == '__main__':
     if args.perturb:
         for eps in epsilons:
             acc, ex = net.test_perturbed(testloader, eps)
-            accuracies.append(acc)
+            accuracies.append(acc / 100)
             # Each index in examples is a tuple of (initial_prediction, final_prediction, image)
             examples.append(ex)
 
@@ -144,10 +144,9 @@ if __name__ == '__main__':
         # Last epsilon is 1, we don't want to plot it
         plt.plot(epsilons[:-1], accuracies[:-1], "*-")
         plt.yticks(np.arange(0, 1.1, step=0.1))
-        plt.ylim((0, 1.1))
         # Last epsilon is 1, we don't want to plot it, so we use epsilons[-2]
         # Step by the second epsilon value
-        plt.xticks(np.arange(epsilons[0], epsilons[-2], step=float(epsilons[1])))
+        plt.xticks(np.arange(epsilons[0], epsilons[-2] + epsilons[1], step=float(epsilons[1])))
         plt.title("Accuracy vs Epsilon")
         plt.xlabel("Epsilon")
         plt.ylabel("Accuracy")
