@@ -133,10 +133,8 @@ if __name__ == '__main__':
 
     if args.perturb:
         for eps in epsilons:
-            acc, ex, p_images = net.test_perturbed(testloader, eps)
+            acc = net.test_perturbed(testloader, eps)
             accuracies.append(acc / 100)
-            # Each index in examples is a tuple of (initial_prediction, final_prediction, image)
-            examples.append(ex)
 
         # Show the epilson vs accuracy graph
         plt.figure(figsize=(5,5))
@@ -151,35 +149,31 @@ if __name__ == '__main__':
         plt.ylabel("Accuracy")
         plt.show()
 
+
+        # Plot first batch
         # Need to unnormalize the images (normalized images = bad for displaying w matplot)
         un = Unnormalize.Unnormalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 
-        # Plot all images in examples
-        # TODO : plot 4 examples per epsilon
+        # Rows = epsilon level, column = image
+        p_images, init_pred, final_pred, labels = net.get_perturbed_images(testloader, epsilons)
 
-
-    un = Unnormalize.Unnormalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-
-    # Rows = epsilon level, column = image
-    p_images, init_pred, final_pred, labels = net.get_perturbed_images(testloader, epsilons)
-
-    x = 0
-    plt.figure(figsize=(8,10))
-    for row in range(len(p_images)):
-        for col in range(p_images[row].shape[0]):
-            img = p_images[row][col]
-            x += 1
-            plt.subplot(4, len(epsilons), x)
-            plt.xticks([], [])
-            plt.yticks([], [])
-            if (img == p_images[row][0]).all():
-                plt.ylabel("Eps: {}".format(epsilons[row]), fontsize=14)
-            img = un(torch.from_numpy(img))
-            img = img.permute(*torch.arange(img.dim() - 1, -1, -1))
-            img = np.rot90(img)
-            img = np.rot90(img)
-            img = np.rot90(img)
-            plt.title(f"Truth: {classes[int(labels[col].item())]}\nGuess: {classes[int(init_pred[0][col].item())]} -> {classes[int(final_pred[row][col].item())]}")
-            plt.imshow(img)
-    plt.tight_layout()
-    plt.show()
+        x = 0
+        plt.figure(figsize=(8,10))
+        for row in range(len(p_images)):
+            for col in range(p_images[row].shape[0]):
+                img = p_images[row][col]
+                x += 1
+                plt.subplot(4, len(epsilons), x)
+                plt.xticks([], [])
+                plt.yticks([], [])
+                if (img == p_images[row][0]).all():
+                    plt.ylabel("Eps: {}".format(epsilons[row]), fontsize=14)
+                img = un(torch.from_numpy(img))
+                img = img.permute(*torch.arange(img.dim() - 1, -1, -1))
+                img = np.rot90(img)
+                img = np.rot90(img)
+                img = np.rot90(img)
+                plt.title(f"Truth: {classes[int(labels[col].item())]}\nGuess: {classes[int(init_pred[0][col].item())]} -> {classes[int(final_pred[row][col].item())]}")
+                plt.imshow(img)
+        plt.tight_layout()
+        plt.show()

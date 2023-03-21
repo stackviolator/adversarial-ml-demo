@@ -132,24 +132,14 @@ class Net(nn.Module):
             # Keep stats on how many correct samples
             correct += (final_pred == labels).sum().item()
 
-            for i in range(len(labels)):
-                # Store images that are correctly classified with Epsilon 0
-                if (epsilon == 0):
-                    if (len(adv_examples) < 10) and final_pred[i] == labels[i]:
-                        adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
-                        adv_examples.append( (init_pred[i], final_pred[i], adv_ex[0]) )
-                # Store images that are misclassified where Epsilon is not 0
-                else:
-                    if len(adv_examples) < 10:
-                        if final_pred[i] != labels[i]:
-                            adv_ex = perturbed_inputs.squeeze().detach().cpu().numpy()
-                            adv_examples.append( (init_pred[i], final_pred[i], adv_ex[1]) )
-
         final_acc = 100 * correct // total
         print(f"Accuracy of the network with Epsilon {epsilon} on the perturbed images: {100 * correct // total}%")
 
-        return final_acc, adv_examples, perturbed_inputs[:4]
+        return final_acc
 
+
+    # TODO figure out if i want to skip the attack for images that are incorrectly labeled at e=0
+    # The answer is yes but its just hard
     def get_perturbed_images(self, testloader, epsilons):
         # Rows = epsilon level, column = image
         p_images = []
@@ -164,10 +154,6 @@ class Net(nn.Module):
             output = self(data)
             _, pred = torch.max(output.data, 1)
             init_pred.append(pred)
-
-            for label in range(target.shape[0]):
-                if pred[label].item() != target[label].item():
-                    print("Not ==")
 
             loss = F.nll_loss(output, target)
             self.zero_grad
