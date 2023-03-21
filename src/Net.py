@@ -44,6 +44,7 @@ class Net(nn.Module):
                 loss.backward()
                 optimizer.step()
 
+
                 running_loss += loss.item()
                 if i % 2000 == 1999 :
                     print(f"[{epoch + i}, {i + 1:5d} loss: {running_loss / 2000:.3f}]")
@@ -120,6 +121,7 @@ class Net(nn.Module):
             loss = F.nll_loss(outputs, labels)
             self.zero_grad()
             loss.backward()
+            inputs.requires_grad = False
             data_grad = inputs.grad
 
             # Define the perturbed data
@@ -158,6 +160,7 @@ class Net(nn.Module):
             loss = F.nll_loss(output, target)
             self.zero_grad
             loss.backward()
+            data.requires_grad = False
             data_grad = data.grad
 
             for e in epsilons:
