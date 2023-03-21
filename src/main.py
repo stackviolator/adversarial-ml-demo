@@ -163,7 +163,7 @@ if __name__ == '__main__':
             for col in range(p_images[row].shape[0]):
                 img = p_images[row][col]
                 x += 1
-                plt.subplot(4, len(epsilons), x)
+                plt.subplot(len(epsilons), 4, x)
                 plt.xticks([], [])
                 plt.yticks([], [])
                 if (img == p_images[row][0]).all():

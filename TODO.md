@@ -1,4 +1,3 @@
 1. Train on good GPU -> highest % the best
-2. Make the matplotting good
-3. Convert py script to notebook
-5. W
+	a. 1 epoch ~ 17 seconds (for me with my single 1070)
+2. W

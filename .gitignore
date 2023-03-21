@@ -1,2 +1,3 @@
 src/__pycache__/
 data/cifar*
+__pycache__
