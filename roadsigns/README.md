@@ -39,12 +39,13 @@ To perform the FGSM attack on the trained Traffic Sign Classifier, use the follo
 
 This will generate adversarial examples for the Traffic Sign Classifier using different epsilon values and display the corresponding images.
 
+## Downloads
+Download the dataset [here](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
+
+Download signnames.csv [here](https://raw.githubusercontent.com/udacity/CarND-Traffic-Sign-Classifier-Project/master/signnames.csv)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
-## Downloads
-Download the dataset [here](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
-
-Download signnames.csv [here](https://raw.githubusercontent.com/udacity/CarND-Traffic-Sign-Classifier-Project/master/signnames.csv)
