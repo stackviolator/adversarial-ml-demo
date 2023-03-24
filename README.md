@@ -37,7 +37,7 @@ To set up this project, follow these steps:
 
 ## Usage
 
-### [CIFAR-10 Classifier Usage]((https://github.com/stackviolator/adversarial-ml-demo/blob/master/cifar/README.md#usage)
+### [CIFAR-10 Classifier Usage](https://github.com/stackviolator/adversarial-ml-demo/blob/master/cifar/README.md#usage)
 ### [Road Sign Classifier Usage](https://github.com/stackviolator/adversarial-ml-demo/blob/master/cifar/README.md#usage)
 
 ## License
