@@ -44,5 +44,7 @@ This will generate adversarial examples for the Traffic Sign Classifier using di
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
-## Download the dataset [here](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
-## Download signnames.csv [here](https://raw.githubusercontent.com/udacity/CarND-Traffic-Sign-Classifier-Project/master/signnames.csv)
+## Downloads
+Download the dataset [here](https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign)
+
+Download signnames.csv [here](https://raw.githubusercontent.com/udacity/CarND-Traffic-Sign-Classifier-Project/master/signnames.csv)
