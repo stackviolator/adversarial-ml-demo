@@ -1,4 +1,4 @@
-src/__pycache__/
-data/cifar*
-data/MNIST*
-__pycache__
+cifar/data/cifar*
+cifar/data/MNIST*
+*__pycache__*
+roadsigns/data
