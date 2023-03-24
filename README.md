@@ -7,8 +7,8 @@ This project demonstrates the Fast Gradient Sign Method (FGSM) adversarial attac
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [CIFAR-10 Classifier](https://github.com/stackviolator/adversarial-ml-demo/cifar/README.md#usage)
-  - [Road Sign Classifier](https://github.com/stackviolator/adversarial-ml-demo/roadsign/README.md#usage)
+  - [CIFAR-10 Classifier](https://github.com/stackviolator/adversarial-ml-demo/blob/master/cifar/README.md#usage)
+  - [Road Sign Classifier](https://github.com/stackviolator/adversarial-ml-demo/blob/master/roadsigns/README.md#usage)
 - [License](#license)
 
 ## Overview
